@@ -105,7 +105,7 @@ def get_polynimial_set(X, degree = 12, bias = True):
     else:
         return X_mat[:,1:]
 
-def plot_boundaries(X_train, y_train, score=None, probability_func=None, degree = None, n_colors = 100, mesh_res = 1000, ax = None):
+def plot_boundaries(X_train, y_train, score=None, probability_func=None, degree = None, n_colors = 100, mesh_res = 200, ax = None):
     X = X_train #np.vstack((X_test, X_train))
     margin_x = (X[:, 0].max() - X[:, 0].min())*0.05
     margin_y = (X[:, 1].max() - X[:, 1].min())*0.05
@@ -152,7 +152,7 @@ def plot_boundaries(X_train, y_train, score=None, probability_func=None, degree 
                edgecolors='k', s=100, marker='o')
     
 
-def fit_and_get_regions(X_train, y_train, X_test, y_test, degree = 2, lambd = 0, plot_it = True, print_it = False):
+def fit_and_get_regions(X_train, y_train, X_test, y_test, degree = 2, lambd = 0, plot_it = True, print_it = False, mesh_res=200):
     X_train_degree = get_polynimial_set(X_train, degree=degree)
     X_test_degree = get_polynimial_set(X_test, degree=degree)
     # Defino el modelo de clasificación como Regresion Logistica
@@ -181,8 +181,8 @@ def fit_and_get_regions(X_train, y_train, X_test, y_test, degree = 2, lambd = 0,
     # print('intercept:', clf_logist_pol.intercept_)
     if plot_it:
         f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,6))
-        plot_boundaries(X_train, y_train, score_train_logist_pol, clf_logist_pol.predict_proba, degree=degree, ax=ax1)
-        plot_boundaries(X_test, y_test, score_test_logist_pol, clf_logist_pol.predict_proba, degree=degree, ax=ax2)
+        plot_boundaries(X_train, y_train, score_train_logist_pol, clf_logist_pol.predict_proba, degree=degree, ax=ax1, mesh_res=mesh_res)
+        plot_boundaries(X_test, y_test, score_test_logist_pol, clf_logist_pol.predict_proba, degree=degree, ax=ax2, mesh_res=mesh_res)
         print('Regresion Logistica Polinomial de orden '+str(degree) +', con lamdba (regularización L2):' +  str(lambd))
         plt.show()
     if print_it:
@@ -265,11 +265,12 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras import optimizers
 from fnn_helper import PlotLosses
+from keras.constraints import max_norm
 
 from matplotlib import pyplot as plt
 from keras.callbacks import ModelCheckpoint
 
-def get_two_layer_model_L2(input_shape, output_size, hidden_units=10, lr=0.1, l2_lambda=0, decay=0.0, initializer='normal', l1_lambda=0, optim = None, activation='relu', dropout=None):
+def get_two_layer_model_L2(input_shape, output_size, hidden_units=10, lr=0.1, l2_lambda=0, decay=0.0, initializer='normal', l1_lambda=0, optim = None, activation='relu', dropout=None, max_norm_value=None):
     model = Sequential()
     if optim is None:
         optim = optimizers.adam(lr=lr, decay=decay)
@@ -278,13 +279,27 @@ def get_two_layer_model_L2(input_shape, output_size, hidden_units=10, lr=0.1, l2
         regularizer = regularizers.l2(l2_lambda)
     if (l1_lambda > 0):
         regularizer = regularizers.l1(l1_lambda)
-    model.add(Dense(hidden_units,input_dim=input_shape,  
+    
+    
+    if max_norm_value is not None:
+        model.add(Dense(hidden_units,input_dim=input_shape,  
+                        kernel_initializer=initializer, 
+                        bias_initializer=initializer,
+                        activation=activation, 
+                        kernel_regularizer=regularizer, 
+                        bias_regularizer=regularizer,
+                        kernel_constraint=max_norm(max_norm_value),
+                        bias_constraint=max_norm(max_norm_value)
+                       ))
+    else:
+        model.add(Dense(hidden_units,input_dim=input_shape,  
                     kernel_initializer=initializer, 
                     bias_initializer=initializer,
                     activation=activation, 
                     kernel_regularizer=regularizer, 
                     bias_regularizer=regularizer
                    ))
+    
     if dropout is not None:
         model.add(Dropout(dropout))
     model.add(Dense(output_size, 
