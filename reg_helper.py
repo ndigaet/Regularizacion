@@ -207,7 +207,7 @@ def test_options(X_train, y_train, X_test, y_test, options, plot_it=False):
         degrees.append(opt['degree'])
         lambdas.append(opt['lambd'])
         coefs_num.append(coefs.shape[1])
-        coefs_array_mean.append(coefs.mean())
+        coefs_array_mean.append(np.abs(coefs).mean())
         coefs_array_std.append(coefs.std())
         coefs_abs_max.append(np.max(abs(coefs)))
         coefs_norm.append(np.linalg.norm(coefs))
