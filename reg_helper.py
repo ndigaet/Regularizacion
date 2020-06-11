@@ -261,6 +261,7 @@ def plot_boundaries_keras(X_train, y_train, score, probability_func, degree=None
             size=40, horizontalalignment='right')
     
 from keras import regularizers
+
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras import optimizers
@@ -289,7 +290,7 @@ def get_two_layer_model_L2(input_shape, output_size, hidden_units=10, lr=0.1, l2
                         kernel_regularizer=regularizer, 
                         bias_regularizer=regularizer,
                         kernel_constraint=max_norm(max_norm_value),
-                        bias_constraint=max_norm(max_norm_value)
+                        #bias_constraint=max_norm(max_norm_value)
                        ))
     else:
         model.add(Dense(hidden_units,input_dim=input_shape,  
