@@ -1,8 +1,8 @@
-import keras
+import tensorflow.keras
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
 
-class PlotLosses(keras.callbacks.Callback):
+class PlotLosses(tensorflow.keras.callbacks.Callback):
     def __init__(self, plot_interval=1, evaluate_interval=10, x_val=None, y_val_categorical=None):
         self.plot_interval = plot_interval
         self.evaluate_interval = evaluate_interval

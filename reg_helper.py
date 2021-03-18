@@ -260,16 +260,16 @@ def plot_boundaries_keras(X_train, y_train, score, probability_func, degree=None
     ax.text(xx.max() - .3, yy.min() + .3, ('%.2f' % score).lstrip('0'),
             size=40, horizontalalignment='right')
     
-from keras import regularizers
+from tensorflow.keras import regularizers
 
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
-from keras import optimizers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten
+from tensorflow.keras import optimizers
 from fnn_helper import PlotLosses
-from keras.constraints import max_norm
+from tensorflow.keras.constraints import max_norm
 
 from matplotlib import pyplot as plt
-from keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 def get_two_layer_model_L2(input_shape, output_size, hidden_units=10, lr=0.1, l2_lambda=0, decay=0.0, initializer='normal', l1_lambda=0, optim = None, activation='relu', dropout=None, max_norm_value=None):
     model = Sequential()
